@@ -5,6 +5,8 @@ Based on code from a [superuser.com forum post](https://superuser.com/questions/
 
 The module includes three functions:
 
-__Set-ICS__
-__Get-ICS__
-__Disable-ICS__
+**Set-ICS**
+
+**Get-ICS**
+
+**Disable-ICS**
