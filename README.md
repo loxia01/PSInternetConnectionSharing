@@ -6,8 +6,7 @@ The module includes three cmdlet functions:
 * Get-ICS
 * Disable-ICS 
 
-It requires to run with administrative rights.
-The module has been tested on Windows 10.
+It requires to run with administrative rights. The module has been tested on Windows 10.
 
 ## Installation
 
