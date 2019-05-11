@@ -18,4 +18,7 @@ Download the PS Module file (psm1) and copy it to your PSModulePath, usually `C:
  
 ### Set-ICS
 #### Description
-
+Set-ICS lets you share the internet connection of a network connection (called the public connection) with another
+ network connection (called the private connection). The specified network connections must exist beforehand.
+ In order to be able to set ICS, the function will first disable ICS for any existing network connections.
+ It will also check for if ICS is already enabled for the specified network connection pair.
