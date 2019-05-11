@@ -28,5 +28,5 @@ The name of the network connection that internet connection will be shared from.
 ##### PrivateConnectionName
 The name of the network connection that internet connection will be shared with.
 #### Usage examples
-1. <Set-ICS -PublicConnectionName Ethernet -PrivateConnectionName 'VM Host-Only Network'>
-2. <Set-ICS Ethernet 'VM Host-Only Network'>
+1. `<Set-ICS -PublicConnectionName Ethernet -PrivateConnectionName 'VM Host-Only Network'>`
+2. `<Set-ICS Ethernet 'VM Host-Only Network'>`
