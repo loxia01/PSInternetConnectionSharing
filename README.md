@@ -42,3 +42,10 @@ Name(s) of the network connection(s) to get ICS status for. Optional.
 1. `Get-ICS` Gets status for ALL network connections.
 2. `Get-ICS -ConnectionNames Ethernet,Ethernet2,'VM Host-Only Network'` Gets status for the specified network connections.
 3. `Get-ICS Ethernet,Ethernet2,'VM Host-Only Network'` Gets status for the specified network connections.
+### Disable-ICS
+#### Description
+Disable-ICS checks for if ICS is enabled for any network connections and, if so, disables ICS for all connections.
+#### Parameters
+None
+#### Usage examples
+1. `Disable-ICS`
