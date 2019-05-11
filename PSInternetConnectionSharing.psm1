@@ -159,11 +159,12 @@ Function Get-ICS
 {
 <#
 .SYNOPSIS
- Retrieves status of Internet Connection Sharing (ICS) for all network connections, 
- or optionally for the specified network connections.
+ Retrieves status of Internet Connection Sharing (ICS) for all network connections, or optionally
+ for the specified network connections.
 
 .DESCRIPTION
- Retrieves status of Internet Connection Sharing (ICS) for all network connections,  or optionally for the specified network connections. Output is printed in the form of a hash table.
+ Retrieves status of Internet Connection Sharing (ICS) for all network connections, or optionally
+ for the specified network connections. Output is printed in the form of a hash table.
 
 .PARAMETER ConnectionNames
  Name(s) of the network connection(s) to get ICS status for. Optional.
