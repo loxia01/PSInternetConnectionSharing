@@ -15,7 +15,7 @@ The module has been tested on Windows 10.
 Download the PS Module file (psm1) and copy it to your PSModulePath, usually `C:\<User>\Documents\WindowsPowerShell\Modules\<Module Folder>\<Module Files>` if installing for a specific user or, if installing for all users, `C:\Program Files\WindowsPowerShell\Modules\<Module Folder>\<Module Files>`. Name the `<Module Folder>` exactly as the psm1 file, in this case "PSInternetConnectionSharing". PowerShell will now automatically find the module and its cmdlets.
   
 ## Functions (cmdlets)
- 
+In PowerShell you can always type `Get-Help <CmdletName>` to get help information.
 ### Set-ICS
 #### Description
 Set-ICS lets you share the internet connection of a network connection (called the public connection) with another
