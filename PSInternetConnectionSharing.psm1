@@ -70,12 +70,12 @@ Function Set-ICS
         { 
 	        $netAdapters = Get-NetAdapter
 	        foreach ($connectionName in $netAdapters.Name)
-            {
+            	{
 		        $connectionProps = $netShare.EnumEveryConnection | Where-Object { $netShare.NetConnectionProps.Invoke($_).Name -eq $connectionName }
 		        $connectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($connectionProps)
             
 		        if ($connectionConfig.SharingEnabled -eq 'True')
-                {
+                	{
 	                $connectionConfig.DisableSharing()    
 		        }
 	        }
@@ -88,15 +88,14 @@ Function Set-ICS
                     if ($? -eq 'True') { Write-Host "ICS was enabled for network connection $connectionName (public connection)." }
                 }
             }
-
             foreach ($connectionName in $netAdapters.Name)
             {
                 if ($connectionName -eq $PrivateConnectionName)
                 {
                     $privateConnectionConfig.EnableSharing(1)
                     if ($? -eq 'True') { Write-Host "ICS was enabled for network connection $connectionName (private connection)." }
-                }
-			}
+               	}
+	    }
         }
     }
 }
