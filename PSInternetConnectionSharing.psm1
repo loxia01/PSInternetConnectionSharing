@@ -65,6 +65,7 @@ Function Set-ICS
         { 
 	    Write-Host "ICS is already set for network connections $PublicConnectionName (public) and $PrivateConnectionName (private)."
         }
+	
         else
         { 
 	    $netAdapters = Get-NetAdapter
