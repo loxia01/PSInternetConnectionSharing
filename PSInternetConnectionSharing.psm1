@@ -78,6 +78,7 @@ Function Set-ICS
 	            $connectionConfig.DisableSharing()    
 		}
 	    }
+	    
             foreach ($connectionName in $netAdapters.Name)
             {
                 if ($connectionName -eq $PublicConnectionName)
