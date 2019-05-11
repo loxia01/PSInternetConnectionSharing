@@ -90,9 +90,6 @@ Function Set-ICS
                         Write-Host "ICS was enabled for network connection $connectionName (public connection)."
                     }
                 }
-            }
-            foreach ($connectionName in $netAdapters.Name)
-            {
                 if ($connectionName -eq $PrivateConnectionName)
                 {
                     $privateConnectionConfig.EnableSharing(1)
