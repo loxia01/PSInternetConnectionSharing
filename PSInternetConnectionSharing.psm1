@@ -119,7 +119,7 @@ Function Disable-ICS
  None
 
 .EXAMPLE
- Get-ICS
+ Disable-ICS
 
 .NOTES
  Version: 1.0
