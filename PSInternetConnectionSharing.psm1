@@ -33,16 +33,16 @@ Function Set-ICS
     Param
     (
         [Parameter(Mandatory = $true)]
-		[ValidateScript({Get-Netadapter -Name $_
+	[ValidateScript({Get-Netadapter -Name $_
         if ($? -eq 'True') { $true }
-		else { throw "$_ is not a valid network connection name." }})]
+	else { throw "$_ is not a valid network connection name." }})]
         [string]
         $PublicConnectionName,
 		
         [Parameter(Mandatory = $true)]
         [ValidateScript({ Get-Netadapter -Name $_
         if ($? -eq 'True') { $true }
-		else { throw "$_ is not a valid network connection name." }})]
+	else { throw "$_ is not a valid network connection name." }})]
         [string]
         $PrivateConnectionName
     )
@@ -63,23 +63,21 @@ Function Set-ICS
         if (($publicConnectionConfig.SharingEnabled -eq 'True' -and $publicConnectionConfig.SharingConnectionType -eq 0) -and `
             ($privateConnectionConfig.SharingEnabled -eq 'True' -and $privateConnectionConfig.SharingConnectionType -eq 1))
         { 
-	        Write-Host "ICS is already set for network connections $PublicConnectionName (public) and $PrivateConnectionName (private)."
+	    Write-Host "ICS is already set for network connections $PublicConnectionName (public) and $PrivateConnectionName (private)."
         }
-
         else
         { 
-	        $netAdapters = Get-NetAdapter
-	        foreach ($connectionName in $netAdapters.Name)
-            	{
-		        $connectionProps = $netShare.EnumEveryConnection | Where-Object { $netShare.NetConnectionProps.Invoke($_).Name -eq $connectionName }
-		        $connectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($connectionProps)
+	    $netAdapters = Get-NetAdapter
+	    foreach ($connectionName in $netAdapters.Name)
+            {
+	    	$connectionProps = $netShare.EnumEveryConnection | Where-Object { $netShare.NetConnectionProps.Invoke($_).Name -eq $connectionName }
+		$connectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($connectionProps)
             
-		        if ($connectionConfig.SharingEnabled -eq 'True')
-                	{
-	                $connectionConfig.DisableSharing()    
-		        }
-	        }
-
+		if ($connectionConfig.SharingEnabled -eq 'True')
+                {
+	            $connectionConfig.DisableSharing()    
+		}
+	    }
             foreach ($connectionName in $netAdapters.Name)
             {
                 if ($connectionName -eq $PublicConnectionName)
@@ -139,7 +137,7 @@ Function Disable-ICS
             
             if ($connectionConfig.SharingEnabled -eq 'True')
             {
-	            $connectionConfig.DisableSharing()
+	        $connectionConfig.DisableSharing()
                 if ($? -eq 'True') { Write-Host "ICS was disabled for network connection $connectionName." }       
             }
         }
@@ -181,10 +179,10 @@ Function Get-ICS
     Param
     (
         [Parameter(Mandatory = $false)]
-		[ValidateScript({foreach ($connectionName in $_) {
+	[ValidateScript({foreach ($connectionName in $_) {
         Get-Netadapter -Name $connectionName
         if ($? -eq 'True') { $true }
-		else { throw "$connectionName is not a valid network connection name." }}})]
+	else { throw "$connectionName is not a valid network connection name." }}})]
         [string[]]
         $ConnectionNames
     )
