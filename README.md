@@ -28,8 +28,8 @@ The name of the network connection that internet connection will be shared from.
 ##### PrivateConnectionName
 The name of the network connection that internet connection will be shared with.
 #### Usage examples
-1. `Set-ICS -PublicConnectionName Ethernet -PrivateConnectionName 'VM Host-Only Network'`
-2. `Set-ICS Ethernet 'VM Host-Only Network'`
+1a. `Set-ICS -PublicConnectionName Ethernet -PrivateConnectionName 'VM Host-Only Network'`
+1b. `Set-ICS Ethernet 'VM Host-Only Network'`
 
 ### Get-ICS
 #### Description
@@ -39,5 +39,6 @@ Retrieves status of Internet Connection Sharing (ICS) for all network connection
 ##### ConnectionNames
 Name(s) of the network connection(s) to get ICS status for. Optional.
 #### Usage examples
-1. `Get-ICS` Gets status for ALL network connections
-2. `Get-ICS -ConnectionNames Ethernet,Ethernet2,'VM Host-Only Network'` Gets status for the specified network connections 
+1. `Get-ICS` Gets status for ALL network connections.
+2a. `Get-ICS -ConnectionNames Ethernet,Ethernet2,'VM Host-Only Network'` Gets status for the specified network connections.
+2b. `Get-ICS Ethernet,Ethernet2,'VM Host-Only Network'` Gets status for the specified network connections.
