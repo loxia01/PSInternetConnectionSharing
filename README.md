@@ -1,12 +1,12 @@
 # PSInternetConnectionSharing
 This PowerShell Module provides simple functions to control Windows Internet Connection Sharing (ICS) from command line.
 
-The module includes three cmdlet functions:
+The module includes three functions:
 * Set-ICS
 * Get-ICS
 * Disable-ICS 
 
-All functions are required to run with administrative rights. All functions works with Powershell version 3.0 and above. 
+All functions are required to run with administrative rights and works with Powershell version 3.0 and above. 
 
 The module has been tested on Windows 10 and is based on code from a [superuser.com forum post](https://superuser.com/questions/470319/how-to-enable-internet-connection-sharing-using-command-line/649183).
 
