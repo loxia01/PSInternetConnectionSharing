@@ -49,7 +49,3 @@ Checks for if ICS is enabled for any network connection and, if so, disables ICS
 None
 #### Usage examples
 1. `Disable-Ics`
-## Limitations
-(Beta version is released that should fix this issue)
-
-This module uses `Get-NetAdapter` command to enumerate the connections on the device. VPN connections handled "internally" by Windows (e.g L2PT/IPsec protocol) do not seem to work with `Get-NetAdapter` command and therefore this module cannot handle such connections. Inputs are welcomed on this [issue](https://github.com/loxia01/PSInternetConnectionSharing/issues/1).
