@@ -18,7 +18,8 @@ Download the PS Module file (.psm1) and then copy it to your PSModulePath. If in
 In PowerShell you can always type `Get-Help <CmdletName>` to get help information.
 ### Set-Ics
 #### Description
-Set-Ics lets you share the internet connection of a network connection (called the public connection) with another network connection (called the private connection). The specified network connections must exist beforehand. In order to be able to set ICS, the function will first disable ICS for any existing network connections. It will also check for if ICS is already enabled for the specified network connection pair.
+Set-Ics lets you share the internet connection of a network connection (called the public connection) with another network connection (called the private connection). The specified network connections must exist beforehand.
+In order to be able to set ICS, the function will first disable ICS for any existing network connections. It will also check for if ICS is already enabled for the specified network connection pair.
 #### Parameters
 ##### PublicConnectionName
 The name of the network connection that internet connection will be shared from.
@@ -30,7 +31,8 @@ The name of the network connection that internet connection will be shared with.
 
 ### Get-Ics
 #### Description
-Retrieves status of Internet Connection Sharing (ICS) for all network connections, or optionally for the specified network connections. Output is printed in the form of a PSCustomObject table.
+Retrieves status of Internet Connection Sharing (ICS) for all network connections, or optionally for the specified network connections.
+Output is printed in the form of a PSCustomObject table.
 #### Parameters
 ##### ConnectionNames
 Name(s) of the network connection(s) to get ICS status for. Optional.
