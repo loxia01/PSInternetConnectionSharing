@@ -15,7 +15,7 @@ Download the PS Module file (.psm1) and then copy it to your PSModulePath. Defau
 - for a specific user: `$Env:UserProfile\Documents\WindowsPowerShell\Modules\<ModuleFolder>\<ModuleFiles>`
 - for all users: `$Env:ProgramFiles\WindowsPowerShell\Modules\<ModuleFolder>\<ModuleFiles>`
 
-Name the `<Module Folder>` exactly as the psm1 file, in this case `PSInternetConnectionSharing`. PowerShell will now automatically find the module and its functions.
+Name the `<ModuleFolder>` exactly as the psm1 file, in this case `PSInternetConnectionSharing`. PowerShell will now automatically find the module and its functions.
 ## Functions
 In PowerShell you can always type `Get-Help <CmdletName>` to get help information.
 ### Set-Ics
