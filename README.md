@@ -41,6 +41,7 @@ Name(s) of the network connection(s) to get ICS status for. Optional.
 `Get-Ics`
 ##### Example 2: Get status for specified network connections
 `Get-Ics -ConnectionNames Ethernet, Ethernet2, 'VM Host-Only Network'`
+
 `Get-Ics Ethernet, Ethernet2, 'VM Host-Only Network'`
 ##### Example 3
 ```
