@@ -12,7 +12,7 @@ The module has been tested on Windows 10 and is based on code from a [superuser.
 ## Installation
 Download the PS Module file (.psm1) and then copy it to your PSModulePath. Default PSModulePath is:
 
-- for a specific user: `$Env:USERPROFILE\Documents\WindowsPowerShell\Modules\<Module Folder>\<Module Files>`
+- for a specific user: `$Env:UserProfile\Documents\WindowsPowerShell\Modules\<Module Folder>\<Module Files>`
 - for all users: `$Env:ProgramFiles\WindowsPowerShell\Modules\<Module Folder>\<Module Files>`
 
 Name the `<Module Folder>` exactly as the psm1 file, in this case `PSInternetConnectionSharing`. PowerShell will now automatically find the module and its functions.
