@@ -38,9 +38,7 @@ Retrieves status of Internet Connection Sharing (ICS) for all network connection
 Name(s) of the network connection(s) to get ICS status for. Optional.
 #### Usage examples
 ##### Example 1: Get status for ALL network connections
-```
-Get-Ics
-```
+`Get-Ics`
 ##### Example 2
 ```
 # Gets status for the specified network connections.
