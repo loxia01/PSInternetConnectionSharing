@@ -22,7 +22,7 @@ In PowerShell you can always type `Get-Help <CmdletName>` to get help informatio
 #### Syntax
 ```
 Set-Ics [-PublicConnectionName] <string> [-PrivateConnectionName] <string> [<CommonParameters>]
-```
+`
 #### Description
 Set-Ics lets you share the internet connection of a network connection (called the public connection) with another network connection (called the private connection). The specified network connections must exist beforehand. In order to be able to set ICS, the function will first disable ICS for any existing network connections. It will also check for if ICS is already enabled for the specified network connection pair.
 #### Parameters
