@@ -34,6 +34,8 @@ The name of the network connection that internet connection will be shared with.
 
 `Set-Ics Ethernet 'VM Host-Only Network'`
 ### Get-Ics
+#### Syntax
+`Get-Ics [[-ConnectionNames] <string[]>] [<CommonParameters>]`
 #### Description
 Retrieves status of Internet Connection Sharing (ICS) for all network connections, or optionally for the specified network connections. Output is printed in the form of a PSCustomObject table.
 #### Parameters
@@ -47,6 +49,8 @@ Name(s) of the network connection(s) to get ICS status for. Optional.
 
 `Get-Ics Ethernet, Ethernet2, 'VM Host-Only Network'`
 ### Disable-Ics
+#### Syntax
+`Disable-Ics [<CommonParameters>]`
 #### Description
 Checks for if ICS is enabled for any network connection and, if so, disables ICS for those connections.
 #### Parameters
