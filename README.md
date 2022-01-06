@@ -37,13 +37,9 @@ Retrieves status of Internet Connection Sharing (ICS) for all network connection
 ##### ConnectionNames
 Name(s) of the network connection(s) to get ICS status for. Optional.
 #### Usage examples
-##### Example 1
-Get status for ALL network connections.
-
+##### Example 1: Get status for ALL network connections
 `Get-Ics`
-##### Example 2
-Get status for specified network connections.
-
+##### Example 2: Get status for specified network connections
 `Get-Ics -ConnectionNames Ethernet, Ethernet2, 'VM Host-Only Network'`
 
 `Get-Ics Ethernet, Ethernet2, 'VM Host-Only Network'`
@@ -53,7 +49,5 @@ Checks for if ICS is enabled for any network connection and, if so, disables ICS
 #### Parameters
 None
 #### Usage examples
-##### Example 1
-Disable ICS for all connections.
-
+##### Example 1: Disable ICS for all connections
 `Disable-Ics`
