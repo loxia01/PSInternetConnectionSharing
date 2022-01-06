@@ -37,7 +37,9 @@ The name of the network connection that internet connection will be shared with.
 `Set-Ics Ethernet 'VM Host-Only Network'`
 ### Get-Ics
 #### Syntax
-`Get-Ics [[-ConnectionNames] <string[]>] [<CommonParameters>]`
+```
+Get-Ics [[-ConnectionNames] <string[]>] [<CommonParameters>]
+```
 #### Description
 Retrieves status of Internet Connection Sharing (ICS) for all network connections, or optionally for the specified network connections. Output is printed in the form of a PSCustomObject table.
 #### Parameters
