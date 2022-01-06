@@ -54,7 +54,9 @@ Name(s) of the network connection(s) to get ICS status for. Optional.
 `Get-Ics Ethernet, Ethernet2, 'VM Host-Only Network'`
 ### Disable-Ics
 #### Syntax
-`Disable-Ics [<CommonParameters>]`
+```
+Disable-Ics [<CommonParameters>]
+```
 #### Description
 Checks for if ICS is enabled for any network connection and, if so, disables ICS for those connections.
 #### Parameters
