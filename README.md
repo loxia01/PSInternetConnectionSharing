@@ -49,4 +49,5 @@ Checks for if ICS is enabled for any network connection and, if so, disables ICS
 #### Parameters
 None
 #### Usage examples
-1. `Disable-Ics`
+##### Example 1: Disable ICS for all connections
+`Disable-Ics`
