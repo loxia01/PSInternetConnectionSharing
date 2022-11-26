@@ -32,7 +32,7 @@ The name of the network connection that internet connection will be shared from.
 ##### -PrivateConnectionName
 The name of the network connection that internet connection will be shared with.
 ##### -PassThru
-If this parameter is specified `Set-ICS` returns an output with the set connections. Optional. By default `Set-ICS` does not generate any output.
+If this parameter is specified `Set-Ics` returns an output with the set connections. Optional. By default `Set-Ics` does not generate any output.
 ##### -WhatIf
 Shows what would happen if the function runs. The function is not run.
 ##### -Confirm
