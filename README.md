@@ -10,12 +10,12 @@ All functions are required to run with administrative rights and works with both
 
 The module has been tested on Windows 10 and is based on code from a [superuser.com forum post](https://superuser.com/questions/470319/how-to-enable-internet-connection-sharing-using-command-line/649183).
 ## Installation
-Download the module files (`.psm1` and `.psd1`) and then create a new module folder in your `PSModulePath`. Default `PSModulePath` is:
+Download the module file (extension `.psm1`) and then create a new module folder in your `PSModulePath`. Default `PSModulePath` is:
 
 - for a specific user: `%UserProfile%\Documents\WindowsPowerShell\Modules\`
 - for all users: `%ProgramFiles%\WindowsPowerShell\Modules\`
 
-Name the new module folder exactly as the filename without the extension, in this case `PSInternetConnectionSharing`, and then copy the downloaded module files to that folder. PowerShell will now automatically find the module and its functions.
+Name the new module folder exactly as the filename without the extension, in this case `PSInternetConnectionSharing`, and then copy the downloaded module file to that folder. PowerShell will now automatically find the module and its functions.
 ## Functions
 In PowerShell you can always type `Get-Help <FunctionName>` to get help information.
 ### Set-Ics
