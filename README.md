@@ -39,8 +39,9 @@ Prompts you for confirmation before each change the function makes.
 #### Usage examples
 ##### Example 1: Set ICS for the specified public and private connections
 `Set-Ics -PublicConnectionName Ethernet -PrivateConnectionName 'VM Host-Only Network'`
-
 `Set-Ics Ethernet 'VM Host-Only Network'`
+##### Example 2: Set ICS for the specified public and private connections and generate an output.
+`Set-Ics Ethernet 'VM Host-Only Network' -PassThru`
 ### Get-Ics
 #### Syntax
 ```
