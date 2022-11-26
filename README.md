@@ -10,9 +10,15 @@ All functions are required to run with administrative rights and works with both
 
 The module has been tested on Windows 10.
 ## Installation
+NEW! The module can be downloaded from PowerShell Gallery using PowerShell command line:
+
+`Install-Module -Name PSInternetConnectionSharing`
+
+or manually downloaded here on GitHub:
+
 Download the module files (extensions `.psm1` and `.psd1`) and then create a new module folder in your `PSModulePath`. Default `PSModulePath` is:
 
-- for a specific user: `%UserProfile%\Documents\WindowsPowerShell\Modules\`
+- for a specific user: `%USERPROFILE%\Documents\WindowsPowerShell\Modules\`
 - for all users: `%ProgramFiles%\WindowsPowerShell\Modules\`
 
 Name the new module folder exactly as the filename without the extension, in this case `PSInternetConnectionSharing`, and then copy the downloaded module files to that folder. PowerShell will now automatically find the module and its functions.
