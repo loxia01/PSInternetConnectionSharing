@@ -32,7 +32,7 @@ The name of the network connection that internet connection will be shared from.
 ##### -PrivateConnectionName
 The name of the network connection that internet connection will be shared with.
 ##### -PassThru
-If this parameter is specified Set-ICS returns an output with the set connections. Optional. By default Set-ICS does not generate any output.
+If this parameter is specified `Set-ICS` returns an output with the set connections. Optional. By default `Set-ICS` does not generate any output.
 ##### -WhatIf
 Shows what would happen if the function runs. The function is not run.
 ##### -Confirm
@@ -40,31 +40,30 @@ Prompts you for confirmation before each change the function makes.
 #### Usage examples
 ##### Example 1: Set ICS for the specified public and private connections
 `Set-Ics -PublicConnectionName Ethernet -PrivateConnectionName 'VM Host-Only Network'`
+
 `Set-Ics Ethernet 'VM Host-Only Network'`
 ##### Example 2: Set ICS for the specified public and private connections and generate an output.
 `Set-Ics Ethernet 'VM Host-Only Network' -PassThru`
 
-
 ### Get-Ics
 #### Syntax
 ```
-Get-Ics [[-ConnectionNames] <string[]>] [<CommonParameters>]
+Get-Ics [[-ConnectionNames] <string[]>] [-ShowEnabled] [<CommonParameters>]
 ```
 #### Description
-Retrieves status of Internet Connection Sharing (ICS) for all network connections, or optionally for the specified network connections. Output is printed in the form of a PSCustomObject table.
+Retrieves status of Internet Connection Sharing (ICS) for all network connections, or optionally for the specified network connections. Output is in the form of a PSCustomObject.
 #### Parameters
-##### ConnectionNames
+##### -ConnectionNames
 Name(s) of the network connection(s) to get ICS status for. Optional.
-
+##### -ShowEnabled
+By default `Get-Ics` lists ICS status for all network connections if parameter ConnectionNames is omitted. When adding parameter ShowEnabled, `Get-Ics` only lists connections where ICS is enabled.
 #### Usage examples
-##### Example 1: Get status for ALL network connections
+##### Example 1: Get status for all network connections
 `Get-Ics`
 ##### Example 2: Get status for specified network connections
 `Get-Ics -ConnectionNames Ethernet, Ethernet2, 'VM Host-Only Network'`
 
 `Get-Ics Ethernet, Ethernet2, 'VM Host-Only Network'`
-##### Example 3: Sets ICS for the specified public and private connections and generates an output.
-`Set-Ics Ethernet 'VM Host-Only Network' -PassThru`
 
 ### Disable-Ics
 #### Syntax
