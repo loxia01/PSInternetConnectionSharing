@@ -60,7 +60,9 @@ By default `Get-Ics` lists ICS status for all network connections if parameter C
 #### Usage examples
 ##### Example 1: Get status for all network connections
 `Get-Ics`
-##### Example 2: Get status for specified network connections
+##### Example 2: Get status for all network connections with ICS enabled.
+`Get-Ics -ShowEnabled`
+##### Example 3: Get status for specified network connections
 `Get-Ics -ConnectionNames Ethernet, Ethernet2, 'VM Host-Only Network'`
 
 `Get-Ics Ethernet, Ethernet2, 'VM Host-Only Network'`
@@ -68,12 +70,19 @@ By default `Get-Ics` lists ICS status for all network connections if parameter C
 ### Disable-Ics
 #### Syntax
 ```
-Disable-Ics [<CommonParameters>]
+Disable-Ics [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 #### Description
 Checks for if ICS is enabled for any network connection and, if so, disables ICS for those connections.
 #### Parameters
-None
+##### -PassThru
+If this parameter is specified `Disable-Ics` returns an output with the disabled connections. Optional. By default `Disable-Ics` does not generate any output.
+##### -Whatif
+Shows what would happen if the function runs. The function is not run.
+##### -Confirm
+Prompts you for confirmation before each change the function makes.
 #### Usage examples
 ##### Example 1: Disable ICS for all connections
 `Disable-Ics`
+##### Example 2: Disable ICS for all connections and generate an output.
+`Disable-Ics -PassThru`
