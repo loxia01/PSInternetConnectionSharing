@@ -10,7 +10,7 @@ All functions are required to run with administrative rights and works with both
 
 The module has been tested on Windows 10.
 ## Installation
-NEW! The module can now be downloaded from PowerShell Gallery using PowerShell command line:
+The module can now be downloaded from PowerShell Gallery using PowerShell command line:
 
 `Install-Module -Name PSInternetConnectionSharing`
 
