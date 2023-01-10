@@ -64,7 +64,7 @@ By default `Get-Ics` lists ICS status for all network connections if parameter *
 #### Example 1: Get status for all network connections
 `Get-Ics`
 #### Example 2: Get status for all network connections with ICS enabled.
-`Get-Ics -ShowEnabled`
+`Get-Ics -HideDisabled`
 #### Example 3: Get status for specified network connections
 `Get-Ics -ConnectionNames Ethernet, Ethernet2, 'VM Host-Only Network'`
 
