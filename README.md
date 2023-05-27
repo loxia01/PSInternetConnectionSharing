@@ -6,7 +6,7 @@ The module includes three functions:
 * `Get-Ics`
 * `Disable-Ics` 
 
-All functions are required to run with administrative rights and works with both Powershell Desktop (v5.1) and Core editions. PowerShell execution policy must be set to RemoteSigned, Unrestricted or Bypass.
+All functions are required to run with administrative rights and works with both Powershell Desktop (v5.1) and Core editions. PowerShell execution policy must be set to `RemoteSigned`, `Unrestricted` or `Bypass`.
 
 The module has been tested on Windows 10.
 ## Installation
