@@ -14,7 +14,7 @@ The module can now be downloaded from PowerShell Gallery using PowerShell comman
 
 `Install-Module -Name PSInternetConnectionSharing`
 
-or manually downloaded here on GitHub:
+OR manually downloaded here on GitHub:
 
 Download the module files (extensions `.psm1` and `.psd1`) and then create a new module folder in your `PSModulePath`. Default `PSModulePath` is:
 
