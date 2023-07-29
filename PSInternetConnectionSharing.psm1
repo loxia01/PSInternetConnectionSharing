@@ -59,9 +59,11 @@ function Set-Ics
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory)]
+        [SupportsWildcards()]
         [string]$PublicConnectionName,
         
         [Parameter(Mandatory)]
+        [SupportsWildcards()]
         [string]$PrivateConnectionName,
         
         [switch]$PassThru
@@ -82,27 +84,32 @@ function Set-Ics
         $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object {
             $netShare.NetConnectionProps.Invoke($_) } | Where-Object Status -NE $null
         
-        if ($connectionsProps.Name -notcontains $PublicConnectionName)
-        {
-            Write-Error "'${PublicConnectionName}' is not a valid network connection name." -Category InvalidArgument -ErrorAction Stop
+        Get-Variable PublicConnectionName, PrivateConnectionName | ForEach-Object {
+            if (-not ($connectionsProps.Name -like $_.Value))
+            {
+                Write-Error "'$($_.Value)' is not a valid network connection name." -Category InvalidArgument -ErrorAction Stop
+            }
+            elseif (($connectionsProps.Name -like $_.Value).Count -gt 1)
+            {
+                Write-Error "'$($_.Value)' resolved to multiple connection names: `n$(($connectionsProps.Name -like $_.Value) -join "`n")`n"`
+                    -Category InvalidArgument -ErrorAction Stop
+            }
+            else
+            {
+                $_.Value = $connectionsProps.Name -like $_.Value
+            }
         }
-        if ($connectionsProps.Name -notcontains $PrivateConnectionName)
-        {
-            Write-Error "'${PrivateConnectionName}' is not a valid network connection name." -Category InvalidArgument -ErrorAction Stop
-        }
+        
         if ($connectionsProps.Where({$_.Name -eq $PrivateConnectionName}).Status -eq 0)
         {
             Write-Error "Private connection '${PrivateConnectionName}' must be enabled to set ICS." -Category NotEnabled -ErrorAction Stop
         }
-        
-        $publicConnectionName = $connectionsProps.Name.Where({$_ -eq $PublicConnectionName})
-        $privateConnectionName = $connectionsProps.Name.Where({$_ -eq $PrivateConnectionName})
     }
     process
     {
-        $publicConnection = $netShare.EnumEveryConnection | Where-Object {$netShare.NetConnectionProps.Invoke($_).Name -eq $publicConnectionName}
+        $publicConnection = $netShare.EnumEveryConnection | Where-Object {$netShare.NetConnectionProps.Invoke($_).Name -eq $PublicConnectionName}
         $publicConnectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($publicConnection)
-        $privateConnection = $netShare.EnumEveryConnection | Where-Object {$netShare.NetConnectionProps.Invoke($_).Name -eq $privateConnectionName}
+        $privateConnection = $netShare.EnumEveryConnection | Where-Object {$netShare.NetConnectionProps.Invoke($_).Name -eq $PrivateConnectionName}
         $privateConnectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($privateConnection)
         
         
@@ -119,13 +126,13 @@ function Set-Ics
                     if ($PSCmdlet.ShouldProcess($connectionName, "DisableICS")) { $connectionConfig.DisableSharing() }
                 }
             }
-            if ($PSCmdlet.ShouldProcess($publicConnectionName)) { $publicConnectionConfig.EnableSharing(0) }
-            if ($PSCmdlet.ShouldProcess($privateConnectionName)) { $privateConnectionConfig.EnableSharing(1) }
+            if ($PSCmdlet.ShouldProcess($PublicConnectionName)) { $publicConnectionConfig.EnableSharing(0) }
+            if ($PSCmdlet.ShouldProcess($PrivateConnectionName)) { $privateConnectionConfig.EnableSharing(1) }
         }
     }
     end
     {
-        if ($PassThru -and ($WhatIfPreference -eq $false)) { Get-Ics -ConnectionNames $publicConnectionName, $privateConnectionName }
+        if ($PassThru -and ($WhatIfPreference -eq $false)) { Get-Ics -ConnectionNames $PublicConnectionName, $PrivateConnectionName }
     }
 }
 
@@ -184,6 +191,7 @@ function Get-Ics
 #>
     [CmdletBinding()]
     param (
+        [SupportsWildcards()]
         [string[]]$ConnectionNames,
         
         [switch]$HideDisabled
@@ -208,23 +216,23 @@ function Get-Ics
             
             if ($ConnectionNames)
             {
-                foreach ($ConnectionName in $ConnectionNames)
+                $ConnectionNames = foreach ($connectionName in $ConnectionNames)
                 {
-                    if ($connectionsProps.Name -notcontains $ConnectionName)
+                    if (-not ($connectionsProps.Name -like $connectionName))
                     {
-                        Write-Error "'${ConnectionName}' is not a valid network connection name." -Category InvalidArgument -ErrorAction Stop
+                        Write-Error "'${connectionName}' is not a valid network connection name." -Category InvalidArgument
+                    }
+                    else
+                    {
+                        $connectionsProps.Name -like $connectionName
                     }
                 }
-                $connectionNames = $connectionsProps.Name.Where({$_ -in $ConnectionNames})
             }
-            else
-            {
-                $connectionNames = $connectionsProps.Name
-            }
+            else { $ConnectionNames = $connectionsProps.Name }
         }
         else
         {
-            if (-not $ConnectionNames) { $connectionNames = $connectionsProps.Name }
+            if (-not $ConnectionNames) { $ConnectionNames = $connectionsProps.Name }
         }
     }
     process
@@ -236,15 +244,15 @@ function Get-Ics
             
             if ($connectionConfig.SharingEnabled -eq $false)
             {
-                [pscustomobject]@{NetworkConnectionName = $connectionName + "    "; StatusICS = 'Disabled'; ConnectionType = $null}
+                [pscustomobject]@{NetworkConnectionName = $connectionName; StatusICS = 'Disabled'; ConnectionType = $null}
             }
             if ($connectionConfig.SharingEnabled -eq $true -and $connectionConfig.SharingConnectionType -eq 0)
             {
-                [pscustomobject]@{NetworkConnectionName = $connectionName + "    "; StatusICS = 'Enabled'; ConnectionType = 'Public'}
+                [pscustomobject]@{NetworkConnectionName = $connectionName; StatusICS = 'Enabled'; ConnectionType = 'Public'}
             }
             if ($connectionConfig.SharingEnabled -eq $true -and $connectionConfig.SharingConnectionType -eq 1)
             {
-                [pscustomobject]@{NetworkConnectionName = $connectionName + "    "; StatusICS = 'Enabled'; ConnectionType = 'Private'}
+                [pscustomobject]@{NetworkConnectionName = $connectionName; StatusICS = 'Enabled'; ConnectionType = 'Private'}
             }
         }
     }
@@ -252,16 +260,22 @@ function Get-Ics
     {
         if ($HideDisabled)
         {
-            $output | Sort-Object ConnectionType -Descending | Where-Object StatusICS -NE Disabled
+            $output = $output | Sort-Object ConnectionType -Descending | Where-Object StatusICS -NE Disabled
         }
         elseif ($output.ConnectionType -match '.+')
         {
-            $output | Sort-Object StatusICS, ConnectionType -Descending
+            $output = $output | Sort-Object StatusICS, ConnectionType -Descending
         }
         else
         {
-            $output | Select-Object NetworkConnectionName, StatusICS
+            $output = $output | Select-Object NetworkConnectionName, StatusICS
         }
+        
+        $output | Format-Table @(
+           @{Name='NetworkConnectionName'; Expression={"{0}    " -f $_.NetworkConnectionName}}
+           'StatusICS'
+           'ConnectionType'
+        )
     }
 }
 
@@ -311,9 +325,7 @@ function Disable-Ics
  Get-Ics
 #>
     [CmdletBinding(SupportsShouldProcess)]
-    param (
-        [switch]$PassThru
-    )
+    param ([switch]$PassThru)
     
     begin
     {
