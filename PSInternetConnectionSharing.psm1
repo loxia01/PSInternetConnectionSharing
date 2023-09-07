@@ -81,7 +81,8 @@ function Set-Ics
         regsvr32 /s hnetcfg.dll
         $netShare = New-Object -ComObject HNetCfg.HNetShare
         
-        $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object {$netShare.NetConnectionProps.Invoke($_)} | Where-Object Status
+        $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object {$netShare.NetConnectionProps.Invoke($_)} |
+            Where-Object Status -NE $null
         
         Get-Variable PublicConnectionName, PrivateConnectionName | ForEach-Object {
             if (-not ($connectionsProps.Name -like $_.Value))
@@ -212,7 +213,8 @@ function Get-Ics
          
         if ((Get-PSCallStack)[1].Command -notmatch '(Disable|Set)-Ics')
         {
-            $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object { $netShare.NetConnectionProps.Invoke($_) } | Where-Object Status
+            $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object {$netShare.NetConnectionProps.Invoke($_)} |
+                Where-Object Status -NE $null
             
             if ($ConnectionNames)
             {
@@ -335,7 +337,8 @@ function Disable-Ics
         regsvr32 /s hnetcfg.dll
         $netShare = New-Object -ComObject HNetCfg.HNetShare
         
-        $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object { $netShare.NetConnectionProps.Invoke($_) } | Where-Object Status
+        $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object {$netShare.NetConnectionProps.Invoke($_)} |
+            Where-Object Status -NE $null
     }
     process
     {
