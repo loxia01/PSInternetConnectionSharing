@@ -167,12 +167,12 @@ function Get-Ics
 .EXAMPLE
  Get-Ics -ConnectionNames Ethernet, Ethernet2, 'VM Host-Only Network'
  
- # Gets status for the specified network connections.
+ # Gets ICS status for the specified network connections.
  
 .EXAMPLE
  Get-Ics Ethernet, Ethernet2, 'VM Host-Only Network'
  
- # Gets status for the specified network connections.
+ # Gets ICS status for the specified network connections.
  
 .INPUTS
  Get-Ics does not take pipeline input.
