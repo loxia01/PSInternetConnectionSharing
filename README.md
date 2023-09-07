@@ -41,7 +41,7 @@ Shows what would happen if the function runs. The function is not run.
 #### -Confirm
 Prompts you for confirmation before each change the function makes.
 ### Usage examples
-#### Example 1: Set ICS for the specified public and private connections
+#### Example 1: Set ICS for the specified public and private connections.
 `Set-Ics -PublicConnectionName Ethernet -PrivateConnectionName 'VM Host-Only Network'`
 
 `Set-Ics Ethernet 'VM Host-Only Network'`
@@ -51,21 +51,22 @@ Prompts you for confirmation before each change the function makes.
 ## Function: Get-Ics
 ### Syntax
 ```
-Get-Ics [[-ConnectionNames] <string[]>] [-HideDisabled] [<CommonParameters>]
+Get-Ics [[-ConnectionNames] <string[]>] [-AllConnections] [<CommonParameters>]
 ```
 ### Description
-Retrieves status of Internet Connection Sharing (ICS) for all network connections, or optionally for the specified network connections. Output is in the form of a PSCustomObject.
+Lists network connections where ICS is enabled, or optionally ICS status for the specified network connections. Outputs a PSCustomObject table.
 ### Parameters
 #### -ConnectionNames
 Name(s) of the network connection(s) to get ICS status for. Optional.
-#### -HideDisabled
-By default `Get-Ics` lists ICS status for all network connections if parameter **ConnectionNames** is omitted. When adding parameter **HideDisabled**, `Get-Ics` only lists connections where ICS is enabled.
+#### -AllConnections
+If parameter **ConnectionNames** is omitted, `Get-Ics` by default only lists network connections where ICS is enabled. To list ICS status for all network connections, add the switch parameter **AllConnections**.
+Cannot be combined with parameter **ConnectionNames**.
 ### Usage examples
-#### Example 1: Get status for all network connections
+#### Example 1: Gets ICS status for all network connections where ICS is enabled.
 `Get-Ics`
-#### Example 2: Get status for all network connections with ICS enabled.
-`Get-Ics -HideDisabled`
-#### Example 3: Get status for specified network connections
+#### Example 2: Gets ICS status for all network connections.
+`Get-Ics -All`
+#### Example 3: Gets ICS status for the specified network connections.
 `Get-Ics -ConnectionNames Ethernet, Ethernet2, 'VM Host-Only Network'`
 
 `Get-Ics Ethernet, Ethernet2, 'VM Host-Only Network'`
@@ -85,7 +86,7 @@ Shows what would happen if the function runs. The function is not run.
 #### -Confirm
 Prompts you for confirmation before each change the function makes.
 ### Usage examples
-#### Example 1: Disable ICS for all connections
+#### Example 1: Disable ICS for all connections.
 `Disable-Ics`
 #### Example 2: Disable ICS for all connections and generate an output.
 `Disable-Ics -PassThru`
