@@ -149,9 +149,9 @@ function Get-Ics
 .PARAMETER ConnectionNames
  Name(s) of the network connection(s) to get ICS status for. Optional.
  
-.PARAMETER All 
+.PARAMETER AllConnections
  If parameter ConnectionNames is omitted, Get-Ics by default only lists network connections where ICS is enabled.
- To list ICS status for all network connections, add the switch parameter All.
+ To list ICS status for all network connections, add the switch parameter AllConnections.
  Cannot be combined with parameter ConnectionNames.
  
 .EXAMPLE
@@ -195,8 +195,8 @@ function Get-Ics
         [SupportsWildcards()]
         [string[]]$ConnectionNames,
         
-        [Parameter(ParameterSetName='All')]
-        [switch]$All
+        [Parameter(ParameterSetName='AllConnections')]
+        [switch]$AllConnections
     )
     
     begin
@@ -260,7 +260,7 @@ function Get-Ics
     }
     end
     {
-        if ($PSBoundParameters.Keys -contains 'ConnectionNames' -or $All)
+        if ($PSBoundParameters.Keys -contains 'ConnectionNames' -or $AllConnections)
         {
             $output = $output | Sort-Object ICSEnabled, ConnectionType -Descending
         }
