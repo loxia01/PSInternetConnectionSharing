@@ -17,8 +17,8 @@ function Set-Ics
  The name of the network connection that internet connection will be shared with.
  
 .PARAMETER PassThru
- If this parameter is specified Set-ICS returns an output with the set connections.
- Optional. By default Set-ICS does not generate any output.
+ If this parameter is specified Set-Ics returns an output with the set connections.
+ Optional. By default Set-Ics does not generate any output.
  
 .PARAMETER WhatIf
  Shows what would happen if the function runs. The function is not run.
@@ -42,10 +42,10 @@ function Set-Ics
  # Sets ICS for the specified public and private connections and generates an output.
  
 .INPUTS
- Set-ICS does not take pipeline input.
+ Set-Ics does not take pipeline input.
  
 .OUTPUTS
- Default is no output. If parameter PassThru is specified Set-ICS returns a PSCustomObject.
+ Default is no output. If parameter PassThru is specified Set-Ics returns a PSCustomObject.
  
 .NOTES
  Set-Ics requires elevated permissions. Use the Run as administrator option when starting PowerShell.
@@ -81,8 +81,7 @@ function Set-Ics
         regsvr32 /s hnetcfg.dll
         $netShare = New-Object -ComObject HNetCfg.HNetShare
         
-        $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object {
-            $netShare.NetConnectionProps.Invoke($_) } | Where-Object Status -NE $null
+        $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object {$netShare.NetConnectionProps.Invoke($_)} | Where-Object Status
         
         Get-Variable PublicConnectionName, PrivateConnectionName | ForEach-Object {
             if (-not ($connectionsProps.Name -like $_.Value))
@@ -113,17 +112,17 @@ function Set-Ics
         $privateConnectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($privateConnection)
         
         
-        if (-not (($publicConnectionConfig.SharingEnabled -eq $true -and $publicConnectionConfig.SharingConnectionType -eq 0) -and
-            ($privateConnectionConfig.SharingEnabled -eq $true -and $privateConnectionConfig.SharingConnectionType -eq 1)))
+        if (-not (($publicConnectionConfig.SharingEnabled -and $publicConnectionConfig.SharingConnectionType -eq 0) -and
+            ($privateConnectionConfig.SharingEnabled -and $privateConnectionConfig.SharingConnectionType -eq 1)))
         {
             foreach ($connectionName in $connectionsProps.Name)
             {
                 $connection = $netShare.EnumEveryConnection | Where-Object {$netShare.NetConnectionProps.Invoke($_).Name -eq $connectionName}
                 $connectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($connection)
 
-                if ($connectionConfig.SharingEnabled -eq $true)
+                if ($connectionConfig.SharingEnabled)
                 {
-                    if ($PSCmdlet.ShouldProcess($connectionName, "DisableICS")) { $connectionConfig.DisableSharing() }
+                    if ($PSCmdlet.ShouldProcess($connectionName, "Disable-Ics")) { $connectionConfig.DisableSharing() }
                 }
             }
             if ($PSCmdlet.ShouldProcess($PublicConnectionName)) { $publicConnectionConfig.EnableSharing(0) }
@@ -132,7 +131,7 @@ function Set-Ics
     }
     end
     {
-        if ($PassThru -and ($WhatIfPreference -eq $false)) { Get-Ics -ConnectionNames $PublicConnectionName, $PrivateConnectionName }
+        if ($PassThru -and $WhatIfPreference -eq $false) { Get-Ics -ConnectionNames $PublicConnectionName, $PrivateConnectionName }
     }
 }
 
@@ -140,29 +139,29 @@ function Get-Ics
 {
 <#
 .SYNOPSIS
- Retrieves status of Internet Connection Sharing (ICS) for all network connections,
- or optionally for the specified network connections.
+ Gets Internet Connection Sharing (ICS) status for network connections.
  
 .DESCRIPTION
- Retrieves status of Internet Connection Sharing (ICS) for all network connections,
- or optionally for the specified network connections. Output is in the form of a PSCustomObject.
+ Lists network connections where ICS is enabled, or optionally ICS status for the specified network connections.
+ Outputs a PSCustomObject table.
  
 .PARAMETER ConnectionNames
  Name(s) of the network connection(s) to get ICS status for. Optional.
  
-.PARAMETER HideDisabled 
- By default Get-Ics lists ICS status for all network connections if parameter ConnectionNames is omitted.
- When adding parameter HideDisabled, Get-Ics only lists connections where ICS is enabled.
+.PARAMETER All 
+ If parameter ConnectionNames is omitted, Get-Ics by default only lists network connections where ICS is enabled.
+ To list ICS status for all network connections, add the switch parameter All.
+ Cannot be combined with parameter ConnectionNames.
  
 .EXAMPLE
  Get-Ics
  
- # Gets status for all network connections.
+ # Gets ICS status for network connections where ICS is enabled.
  
 .EXAMPLE
- Get-Ics -HideDisabled
+ Get-Ics -All
  
- # Gets status for all network connections with ICS enabled.
+ # Gets ICS status for all network connections.
  
 .EXAMPLE
  Get-Ics -ConnectionNames Ethernet, Ethernet2, 'VM Host-Only Network'
@@ -175,7 +174,7 @@ function Get-Ics
  # Gets status for the specified network connections.
  
 .INPUTS
- Get-ICS does not take pipeline input.
+ Get-Ics does not take pipeline input.
  
 .OUTPUTS
  PSCustomObject.
@@ -189,12 +188,14 @@ function Get-Ics
  Set-Ics
  Disable-Ics
 #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='ConnectionNames')]
     param (
+        [Parameter(ParameterSetName='ConnectionNames', Position=0)]
         [SupportsWildcards()]
         [string[]]$ConnectionNames,
         
-        [switch]$HideDisabled
+        [Parameter(ParameterSetName='All')]
+        [switch]$All
     )
     
     begin
@@ -208,11 +209,10 @@ function Get-Ics
         
         regsvr32 /s hnetcfg.dll
         $netShare = New-Object -ComObject HNetCfg.HNetShare
-        
+         
         if ((Get-PSCallStack)[1].Command -notmatch '(Disable|Set)-Ics')
         {
-            $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object {
-                $netShare.NetConnectionProps.Invoke($_) } | Where-Object Status -NE $null
+            $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object { $netShare.NetConnectionProps.Invoke($_) } | Where-Object Status
             
             if ($ConnectionNames)
             {
@@ -242,39 +242,35 @@ function Get-Ics
             $connection = $netShare.EnumEveryConnection | Where-Object {$netShare.NetConnectionProps.Invoke($_).Name -eq $connectionName}
             $connectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($connection)
             
-            if ($connectionConfig.SharingEnabled -eq $false)
+            if (-not $connectionConfig.SharingEnabled)
             {
-                [pscustomobject]@{NetworkConnectionName = $connectionName; StatusICS = 'Disabled'; ConnectionType = $null}
+                [pscustomobject]@{NetworkConnectionName = $connectionName; ICSEnabled = $false; ConnectionType = $null}
             }
-            if ($connectionConfig.SharingEnabled -eq $true -and $connectionConfig.SharingConnectionType -eq 0)
+            if ($connectionConfig.SharingEnabled -and $connectionConfig.SharingConnectionType -eq 0)
             {
-                [pscustomobject]@{NetworkConnectionName = $connectionName; StatusICS = 'Enabled'; ConnectionType = 'Public'}
+                [pscustomobject]@{NetworkConnectionName = $connectionName; ICSEnabled = $true; ConnectionType = 'Public'}
             }
-            if ($connectionConfig.SharingEnabled -eq $true -and $connectionConfig.SharingConnectionType -eq 1)
+            if ($connectionConfig.SharingEnabled -and $connectionConfig.SharingConnectionType -eq 1)
             {
-                [pscustomobject]@{NetworkConnectionName = $connectionName; StatusICS = 'Enabled'; ConnectionType = 'Private'}
+                [pscustomobject]@{NetworkConnectionName = $connectionName; ICSEnabled = $true; ConnectionType = 'Private'}
             }
         }
     }
     end
     {
-        if ($HideDisabled)
+        if ($PSBoundParameters.Keys -contains 'ConnectionNames' -or $All)
         {
-            $output = $output | Sort-Object ConnectionType -Descending | Where-Object StatusICS -NE Disabled
-        }
-        elseif ($output.ConnectionType -match '.+')
-        {
-            $output = $output | Sort-Object StatusICS, ConnectionType -Descending
+            $output = $output | Sort-Object ICSEnabled, ConnectionType -Descending
         }
         else
         {
-            $output = $output | Select-Object NetworkConnectionName, StatusICS
+            $output = $output | Where-Object ICSEnabled | Sort-Object ConnectionType -Descending
         }
         
         $output | Format-Table @(
-           @{Name='NetworkConnectionName'; Expression={"{0}    " -f $_.NetworkConnectionName}}
-           'StatusICS'
-           'ConnectionType'
+           'NetworkConnectionName'
+           'ICSEnabled'
+           if ($output.ICSEnabled -match $true) { 'ConnectionType' }
         )
     }
 }
@@ -290,8 +286,8 @@ function Disable-Ics
  disables ICS for those connections.
  
 .PARAMETER PassThru
- If this parameter is specified Disable-ICS returns an output with the disabled connections.
- Optional. By default Disable-ICS does not generate any output.
+ If this parameter is specified Disable-Ics returns an output with the disabled connections.
+ Optional. By default Disable-Ics does not generate any output.
  
 .PARAMETER WhatIf
  Shows what would happen if the function runs. The function is not run.
@@ -310,10 +306,10 @@ function Disable-Ics
  # Disables ICS for all connections and generates an output.
  
 .INPUTS
- Disable-ICS does not take pipeline input.
+ Disable-Ics does not take pipeline input.
  
 .OUTPUTS
- Default is no output. If parameter PassThru is specified Disable-ICS returns a PSCustomObject.
+ Default is no output. If parameter PassThru is specified Disable-Ics returns a PSCustomObject.
  
 .NOTES
  Disable-Ics requires elevated permissions. Use the Run as administrator option when starting PowerShell.
@@ -339,28 +335,26 @@ function Disable-Ics
         regsvr32 /s hnetcfg.dll
         $netShare = New-Object -ComObject HNetCfg.HNetShare
         
-        $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object {
-            $netShare.NetConnectionProps.Invoke($_) } | Where-Object Status -NE $null
+        $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object { $netShare.NetConnectionProps.Invoke($_) } | Where-Object Status
     }
     process
     {
-        $disabledNames = @()
-        foreach ($connectionName in $connectionsProps.Name)
+        $disabledNames = foreach ($connectionName in $connectionsProps.Name)
         {
             $connection = $netShare.EnumEveryConnection | Where-Object {$netShare.NetConnectionProps.Invoke($_).Name -eq $connectionName}
             $connectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($connection)
-            if ($connectionConfig.SharingEnabled -eq $true)
+            if ($connectionConfig.SharingEnabled)
             {
                 if ($PSCmdlet.ShouldProcess($connectionName))
                 {
                     $connectionConfig.DisableSharing()
-                    $disabledNames += $connectionName
+                    $connectionName
                 }
             }
         }
     }
     end
     {
-        if ($PassThru -and ($WhatIfPreference -eq $false)) { Get-Ics $disabledNames }
+        if ($PassThru -and $WhatIfPreference -eq $false) { Get-Ics -ConnectionNames $disabledNames }
     }
 }
