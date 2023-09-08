@@ -17,7 +17,7 @@ function Set-Ics
  The name of the network connection that internet connection will be shared with.
  
 .PARAMETER PassThru
- If this parameter is specified Set-Ics returns an output with the set connections.
+ If this parameter is specified Set-Ics returns an object representing the set connections.
  Optional. By default Set-Ics does not generate any output.
  
 .PARAMETER WhatIf
@@ -143,8 +143,8 @@ function Get-Ics
  Gets Internet Connection Sharing (ICS) status for network connections.
  
 .DESCRIPTION
- Lists network connections where ICS is enabled, or optionally ICS status for the specified network connections.
- Outputs a PSCustomObject table.
+ Gets network connections where ICS is enabled, or optionally for all specified network connections.
+ Output is a PSCustomObject representing the connections.
  
 .PARAMETER ConnectionNames
  Name(s) of the network connection(s) to get ICS status for. Optional.
@@ -160,7 +160,7 @@ function Get-Ics
  # Gets ICS status for network connections where ICS is enabled.
  
 .EXAMPLE
- Get-Ics -All
+ Get-Ics -AllConnections
  
  # Gets ICS status for all network connections.
  
@@ -230,12 +230,8 @@ function Get-Ics
                     }
                 }
             }
-            else { $ConnectionNames = $connectionsProps.Name }
         }
-        else
-        {
-            if (-not $ConnectionNames) { $ConnectionNames = $connectionsProps.Name }
-        }
+        if (-not $ConnectionNames) { $connectionNames = $connectionsProps.Name }
     }
     process
     {
@@ -246,7 +242,7 @@ function Get-Ics
             
             if (-not $connectionConfig.SharingEnabled)
             {
-                [pscustomobject]@{NetworkConnectionName = $connectionName; ICSEnabled = $false; ConnectionType = $null}
+                [pscustomobject]@{NetworkConnectionName = $connectionName; ICSEnabled = $false}
             }
             if ($connectionConfig.SharingEnabled -and $connectionConfig.SharingConnectionType -eq 0)
             {
@@ -268,12 +264,7 @@ function Get-Ics
         {
             $output = $output | Where-Object ICSEnabled | Sort-Object ConnectionType -Descending
         }
-        
-        $output | Format-Table @(
-           'NetworkConnectionName'
-           'ICSEnabled'
-           if ($output.ICSEnabled -match $true) { 'ConnectionType' }
-        )
+        $output
     }
 }
 
@@ -284,11 +275,10 @@ function Disable-Ics
  Disables Internet Connection Sharing (ICS) for all network connections.
  
 .DESCRIPTION
- Disable-Ics checks for if ICS is enabled for any network connections and, if so,
- disables ICS for those connections.
+ Disable-Ics checks for if ICS is enabled for any network connections and disables ICS for those connections.
  
 .PARAMETER PassThru
- If this parameter is specified Disable-Ics returns an output with the disabled connections.
+ If this parameter is specified Disable-Ics returns an object representing the disabled connections.
  Optional. By default Disable-Ics does not generate any output.
  
 .PARAMETER WhatIf
@@ -358,6 +348,10 @@ function Disable-Ics
     }
     end
     {
-        if ($PassThru -and $WhatIfPreference -eq $false) { Get-Ics -ConnectionNames $disabledNames }
+        if ($PassThru -and $WhatIfPreference -eq $false)
+        {
+            if ($disabledNames) { Get-Ics -ConnectionNames $disabledNames }
+            else                { Get-Ics -AllConnections }
+        }
     }
 }
