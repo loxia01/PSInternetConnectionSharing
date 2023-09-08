@@ -35,7 +35,7 @@ The name of the network connection that internet connection will be shared from.
 #### -PrivateConnectionName
 The name of the network connection that internet connection will be shared with.
 #### -PassThru
-If this parameter is specified `Set-Ics` returns an output with the set connections. Optional. By default `Set-Ics` does not generate any output.
+If this parameter is specified `Set-Ics` returns an object representing the set connections. Optional. By default `Set-Ics` does not generate any output.
 #### -WhatIf
 Shows what would happen if the function runs. The function is not run.
 #### -Confirm
@@ -54,7 +54,7 @@ Prompts you for confirmation before each change the function makes.
 Get-Ics [[-ConnectionNames] <string[]>] [-AllConnections] [<CommonParameters>]
 ```
 ### Description
-Lists network connections where ICS is enabled, or optionally ICS status for the specified network connections. Outputs a PSCustomObject table.
+Lists network connections where ICS is enabled, or optionally ICS status for the specified network connections. Output is a PSCustomObject representing the connections.
 ### Parameters
 #### -ConnectionNames
 Name(s) of the network connection(s) to get ICS status for. Optional.
@@ -65,7 +65,7 @@ Cannot be combined with parameter **ConnectionNames**.
 #### Example 1: Gets ICS status for all network connections where ICS is enabled.
 `Get-Ics`
 #### Example 2: Gets ICS status for all network connections.
-`Get-Ics -All`
+`Get-Ics -AllConnections`
 #### Example 3: Gets ICS status for the specified network connections.
 `Get-Ics -ConnectionNames Ethernet, Ethernet2, 'VM Host-Only Network'`
 
@@ -80,7 +80,7 @@ Disable-Ics [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 Checks for if ICS is enabled for any network connection and, if so, disables ICS for those connections.
 ### Parameters
 #### -PassThru
-If this parameter is specified `Disable-Ics` returns an output with the disabled connections. Optional. By default `Disable-Ics` does not generate any output.
+If this parameter is specified `Disable-Ics` returns an object representing the disabled connections. Optional. By default `Disable-Ics` does not generate any output.
 #### -Whatif
 Shows what would happen if the function runs. The function is not run.
 #### -Confirm
