@@ -210,8 +210,8 @@ function Get-Ics
         
         regsvr32 /s hnetcfg.dll
         $netShare = New-Object -ComObject HNetCfg.HNetShare
-         
-        if ((Get-PSCallStack)[1].Command -notmatch '(Disable|Set)-Ics')
+        
+        if ($MyInvocation.PSCommandPath -notmatch 'PSInternetConnectionSharing.psm1')
         {
             $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object {$netShare.NetConnectionProps.Invoke($_)} |
                 Where-Object Status -NE $null
@@ -256,15 +256,14 @@ function Get-Ics
     }
     end
     {
-        if ($PSBoundParameters.Keys -contains 'ConnectionNames' -or $AllConnections)
+        if ($AllConnections -or $PSBoundParameters.ContainsKey('ConnectionNames'))
         {
-            $output = $output | Sort-Object ICSEnabled, ConnectionType -Descending
+             return $output | Sort-Object ICSEnabled, ConnectionType -Descending
         }
         else
         {
-            $output = $output | Where-Object ICSEnabled | Sort-Object ConnectionType -Descending
+             return $output | Where-Object ICSEnabled | Sort-Object ConnectionType -Descending
         }
-        $output
     }
 }
 
