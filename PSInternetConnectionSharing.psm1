@@ -242,15 +242,15 @@ function Get-Ics
             
             if (-not $connectionConfig.SharingEnabled)
             {
-                [pscustomobject]@{NetworkConnectionName = $connectionName; ICSEnabled = $false}
+                [pscustomobject]@{ConnectionName = $connectionName; ICSEnabled = $false}
             }
             if ($connectionConfig.SharingEnabled -and $connectionConfig.SharingConnectionType -eq 0)
             {
-                [pscustomobject]@{NetworkConnectionName = $connectionName; ICSEnabled = $true; ConnectionType = 'Public'}
+                [pscustomobject]@{ConnectionName = $connectionName; ICSEnabled = $true; ConnectionType = 'Public'}
             }
             if ($connectionConfig.SharingEnabled -and $connectionConfig.SharingConnectionType -eq 1)
             {
-                [pscustomobject]@{NetworkConnectionName = $connectionName; ICSEnabled = $true; ConnectionType = 'Private'}
+                [pscustomobject]@{ConnectionName = $connectionName; ICSEnabled = $true; ConnectionType = 'Private'}
             }
         }
     }
