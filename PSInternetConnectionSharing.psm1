@@ -258,11 +258,11 @@ function Get-Ics
     {
         if ($AllConnections -or $PSBoundParameters.ContainsKey('ConnectionNames'))
         {
-             return $output | Sort-Object ICSEnabled, ConnectionType -Descending
+             $output | Sort-Object ICSEnabled, ConnectionType -Descending
         }
         else
         {
-             return $output | Where-Object ICSEnabled | Sort-Object ConnectionType -Descending
+             $output | Where-Object ICSEnabled | Sort-Object ConnectionType -Descending
         }
     }
 }
