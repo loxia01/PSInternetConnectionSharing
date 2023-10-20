@@ -100,7 +100,7 @@ function Set-Ics
             }
         }
         
-        if ($connectionsProps.Where({$_.Name -eq $PrivateConnectionName}).Status -eq 0)
+        if (($connectionsProps | Where-Object Name -EQ $PrivateConnectionName).Status -eq 0)
         {
             Write-Error "Private connection '${PrivateConnectionName}' must be enabled to set ICS." -Category NotEnabled -ErrorAction Stop
         }
