@@ -1,3 +1,6 @@
+using namespace System.Security.Principal
+using namespace System.Management.Automation
+
 function Set-Ics
 {
 <#
@@ -71,11 +74,14 @@ function Set-Ics
     
     begin
     {
-        if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::
-            GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator'))
+        if (-not ([WindowsPrincipal][WindowsIdentity]::GetCurrent()).IsInRole([WindowsBuiltInRole]'Administrator'))
         {
-            Write-Error "This function requires administrator rights. Restart PowerShell using the Run as Administrator option."`
-                -Category PermissionDenied -ErrorAction Stop
+            $PSCmdlet.ThrowTerminatingError([ErrorRecord]::new(
+                [Exception]::new("This function requires administrator rights."),
+                'AdminPrivilegeRequired',
+                [ErrorCategory]::PermissionDenied,
+                $null
+            ))
         }
         
         regsvr32 /s hnetcfg.dll
@@ -87,12 +93,23 @@ function Set-Ics
         Get-Variable PublicConnectionName, PrivateConnectionName | ForEach-Object {
             if (-not ($connectionsProps.Name -like $_.Value))
             {
-                Write-Error "'$($_.Value)' is not a valid network connection name." -Category InvalidArgument -ErrorAction Stop
+                $PSCmdlet.ThrowTerminatingError([ErrorRecord]::new(
+                    [PSArgumentException]::new("Network connection '$($_.Value)' was not found."),
+                    'ConnectionNotFound',
+                    [ErrorCategory]::ObjectNotFound,
+                    $_.Value
+                ))
             }
             elseif (($connectionsProps.Name -like $_.Value).Count -gt 1)
             {
-                Write-Error "'$($_.Value)' resolved to multiple connection names: `n$(($connectionsProps.Name -like $_.Value) -join "`n")`n"`
-                    -Category InvalidArgument -ErrorAction Stop
+                $PSCmdlet.ThrowTerminatingError([ErrorRecord]::new(
+                    [PSArgumentException]::new(
+                        "'$($_.Value)' resolved to multiple connection names: `n$(($connectionsProps.Name -like $_.Value) -join "`n")`n"
+                    ),
+                    'MultipleResolvedConnections',
+                    [ErrorCategory]::InvalidArgument,
+                    $null
+                ))
             }
             else
             {
@@ -102,7 +119,12 @@ function Set-Ics
         
         if (($connectionsProps | Where-Object Name -EQ $PrivateConnectionName).Status -eq 0)
         {
-            Write-Error "Private connection '${PrivateConnectionName}' must be enabled to set ICS." -Category NotEnabled -ErrorAction Stop
+            $PSCmdlet.ThrowTerminatingError([ErrorRecord]::new(
+                [Exception]::new("Private connection '${PrivateConnectionName}' must be enabled to set ICS."),
+                'PrivateConnectionNotEnabled',
+                [ErrorCategory]::NotEnabled,
+                $PrivateConnectionName
+            ))
         }
     }
     process
@@ -201,11 +223,14 @@ function Get-Ics
     
     begin
     {
-        if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::
-            GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator'))
+        if (-not ([WindowsPrincipal][WindowsIdentity]::GetCurrent()).IsInRole([WindowsBuiltInRole]'Administrator'))
         {
-            Write-Error "This function requires administrator rights. Restart PowerShell using the Run as Administrator option."`
-                -Category PermissionDenied -ErrorAction Stop
+            $PSCmdlet.ThrowTerminatingError([ErrorRecord]::new(
+                [Exception]::new("This function requires administrator rights."),
+                'AdminPrivilegeRequired',
+                [ErrorCategory]::PermissionDenied,
+                $null
+            ))
         }
         
         regsvr32 /s hnetcfg.dll
@@ -222,7 +247,12 @@ function Get-Ics
                 {
                     if (-not ($connectionsProps.Name -like $connectionName))
                     {
-                        Write-Error "'${connectionName}' is not a valid network connection name." -Category InvalidArgument
+                        $PSCmdlet.ThrowTerminatingError([ErrorRecord]::new(
+                            [PSArgumentException]::new("Network connection '$($connectionName)' was not found."),
+                            'ConnectionNotFound',
+                            [ErrorCategory]::ObjectNotFound,
+                            $connectionName
+                        ))
                     }
                     else
                     {
@@ -316,11 +346,14 @@ function Disable-Ics
     
     begin
     {
-        if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::
-            GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator'))
+        if (-not ([WindowsPrincipal][WindowsIdentity]::GetCurrent()).IsInRole([WindowsBuiltInRole]'Administrator'))
         {
-            Write-Error "This function requires administrator rights. Restart PowerShell using the Run as Administrator option."`
-                -Category PermissionDenied -ErrorAction Stop
+            $PSCmdlet.ThrowTerminatingError([ErrorRecord]::new(
+                [Exception]::new("This function requires administrator rights."),
+                'AdminPrivilegeRequired',
+                [ErrorCategory]::PermissionDenied,
+                $null
+            ))
         }
         
         regsvr32 /s hnetcfg.dll
