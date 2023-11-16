@@ -76,9 +76,8 @@ function Set-Ics
     {
         if (-not ([WindowsPrincipal][WindowsIdentity]::GetCurrent()).IsInRole([WindowsBuiltInRole]'Administrator'))
         {
-            $message = "This function requires administrator rights."
-            $errArgs = (New-Object Exception $message), 'AdminPrivilegeRequired', 18, $null
-            $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord $errArgs))
+            $exception = "This function requires administrator rights."
+            $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord $exception, 'AdminPrivilegeRequired', 18, $null))
         }
 
         regsvr32 /s hnetcfg.dll
@@ -90,15 +89,15 @@ function Set-Ics
         Get-Variable PublicConnectionName, PrivateConnectionName | ForEach-Object {
             if (-not ($connectionsProps.Name -like $_.Value))
             {
-                $message = "Network connection '$($_.Value)' was not found."
-                $errArgs = (New-Object PSArgumentException $message), 'ConnectionNotFound', 13, $null
-                $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord $errArgs))
+                $exception = New-Object PSArgumentException "Cannot find a network connection with name '$($_.Value)'."
+                $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord $exception, 'ConnectionNotFound', 13, $null))
             }
             elseif (($connectionsProps.Name -like $_.Value).Count -gt 1)
             {
-                $message = "'$($_.Value)' resolved to multiple connection names: `n$(($connectionsProps.Name -like $_.Value) -join "`n")`n"
-                $errArgs = (New-Object PSArgumentException $message), 'MultipleResolvedConnections', 5, $null
-                $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord $errArgs))
+                $exception = New-Object PSArgumentException (
+                    "'$($_.Value)' resolved to multiple connection names: `n$(($connectionsProps.Name -like $_.Value) -join "`n")`n"
+                )
+                $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord $exception, 'MultipleResolvedConnectionNames', 5, $null))
             }
             else
             {
@@ -108,9 +107,8 @@ function Set-Ics
 
         if (($connectionsProps | Where-Object Name -EQ $PrivateConnectionName).Status -eq 0)
         {
-            $message = "Private connection '${PrivateConnectionName}' must be enabled to set ICS."
-            $errArgs = (New-Object Exception $message), 'PrivateConnectionNotEnabled', 31, $null
-            $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord $errArgs))
+            $exception = "Private connection '${PrivateConnectionName}' must be enabled to set ICS."
+            $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord $exception, 'ConnectionNotEnabled', 31, $null))
         }
     }
     process
@@ -211,9 +209,8 @@ function Get-Ics
     {
         if (-not ([WindowsPrincipal][WindowsIdentity]::GetCurrent()).IsInRole([WindowsBuiltInRole]'Administrator'))
         {
-            $message = "This function requires administrator rights."
-            $errArgs = (New-Object Exception $message), 'AdminPrivilegeRequired', 18, $null
-            $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord $errArgs))
+            $exception = "This function requires administrator rights."
+            $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord $exception, 'AdminPrivilegeRequired', 18, $null))
         }
 
         regsvr32 /s hnetcfg.dll
@@ -230,9 +227,8 @@ function Get-Ics
                 {
                     if (-not ($connectionsProps.Name -like $connectionName))
                     {
-                        $message = "Network connection '$($connectionName)' was not found."
-                        $errArgs = (New-Object PSArgumentException $message), 'ConnectionNotFound', 13, $connectionName
-                        $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord $errArgs))
+                        $exception = New-Object PSArgumentException "Cannot find a network connection with name '$($_.Value)'."
+                        $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord $exception, 'ConnectionNotFound', 13, $null))
                     }
                     else
                     {
@@ -328,9 +324,8 @@ function Disable-Ics
     {
         if (-not ([WindowsPrincipal][WindowsIdentity]::GetCurrent()).IsInRole([WindowsBuiltInRole]'Administrator'))
         {
-            $message = "This function requires administrator rights."
-            $errArgs = (New-Object Exception $message), 'AdminPrivilegeRequired', 18, $null
-            $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord $errArgs))
+            $exception = "This function requires administrator rights."
+            $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord $exception, 'AdminPrivilegeRequired', 18, $null))
         }
 
         regsvr32 /s hnetcfg.dll
