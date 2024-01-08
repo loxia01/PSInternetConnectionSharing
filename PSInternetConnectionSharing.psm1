@@ -62,11 +62,9 @@ function Set-Ics
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory)]
-        [SupportsWildcards()]
         [string]$PublicConnectionName,
 
         [Parameter(Mandatory)]
-        [SupportsWildcards()]
         [string]$PrivateConnectionName,
 
         [switch]$PassThru
@@ -86,25 +84,18 @@ function Set-Ics
         $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object {$netShare.NetConnectionProps.Invoke($_)} |
             Where-Object Status -NE $null
 
-        Get-Variable PublicConnectionName, PrivateConnectionName | ForEach-Object {
-            if (-not ($connectionsProps.Name -like $_.Value))
+        $PublicConnectionName, $PrivateConnectionName | ForEach-Object {
+            if ($connectionsProps.Name -notcontains $_)
             {
-                $exception = New-Object PSArgumentException "Cannot find a network connection with name '$($_.Value)'."
+                $exception = New-Object PSArgumentException "Cannot find a network connection with name '${_}'."
                 $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord -Args $exception, 'ConnectionNotFound', 13, $null))
             }
-            elseif (($connectionsProps.Name -like $_.Value).Count -gt 1)
-            {
-                $exception = New-Object PSArgumentException (
-                    "'$($_.Value)' resolved to multiple connection names: `n$(($connectionsProps.Name -like $_.Value) -join "`n")`n"
-                )
-                $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord -Args $exception, 'MultipleResolvedConnectionNames', 5, $null))
-            }
-            else
-            {
-                $_.Value = $connectionsProps.Name -like $_.Value
-            }
         }
-
+        if ($PrivateConnectionName -eq $PublicConnectionName)
+        {
+            $exception = New-Object PSArgumentException "The private connection cannot be the same as the public connection."
+            $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord -Args $exception, 'InvalidConnection', 5, $null))
+        }
         if (($connectionsProps | Where-Object Name -EQ $PrivateConnectionName).Status -eq 0)
         {
             $exception = "Private connection '${PrivateConnectionName}' must be enabled to set ICS."
