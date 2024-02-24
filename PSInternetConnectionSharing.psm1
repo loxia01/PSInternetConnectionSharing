@@ -81,8 +81,8 @@ function Set-Ics
         regsvr32 /s hnetcfg.dll
         $netShare = New-Object -ComObject HNetCfg.HNetShare
 
-        $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object {$netShare.NetConnectionProps.Invoke($_)} |
-            Where-Object Status -NE $null
+        $connections = @($netShare.EnumEveryConnection)
+        $connectionsProps = $connections | ForEach-Object { $netShare.NetConnectionProps.Invoke($_) } | Where-Object Status -NE $null
 
         Get-Variable PublicConnectionName, PrivateConnectionName | ForEach-Object {
             if ($connectionsProps.Name -notcontains $_.Value)
@@ -98,7 +98,6 @@ function Set-Ics
             $exception = New-Object PSArgumentException "The private connection cannot be the same as the public connection."
             $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord -Args $exception, 'InvalidConnection', 5, $null))
         }
-
         if (($connectionsProps | Where-Object Name -EQ $PrivateConnectionName).Status -eq 0)
         {
             $exception = "Private connection '${PrivateConnectionName}' must be enabled to set ICS."
@@ -107,28 +106,35 @@ function Set-Ics
     }
     process
     {
-        $publicConnection = $netShare.EnumEveryConnection | Where-Object {$netShare.NetConnectionProps.Invoke($_).Name -eq $PublicConnectionName}
-        $publicConnectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($publicConnection)
-        $privateConnection = $netShare.EnumEveryConnection | Where-Object {$netShare.NetConnectionProps.Invoke($_).Name -eq $PrivateConnectionName}
-        $privateConnectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($privateConnection)
-
+        $connections | ForEach-Object {
+            if ($netShare.NetConnectionProps.Invoke($_).Name -eq $PublicConnectionName)
+            {
+                $publicConnectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($_)
+            }
+            elseif ($netShare.NetConnectionProps.Invoke($_).Name -eq $PrivateConnectionName)
+            {
+                $privateConnectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($_)
+            }
+            else { return }
+        }
 
         if (-not (($publicConnectionConfig.SharingEnabled -and $publicConnectionConfig.SharingConnectionType -eq 0) -and
             ($privateConnectionConfig.SharingEnabled -and $privateConnectionConfig.SharingConnectionType -eq 1)))
         {
-            $connectionsICS = foreach ($connectionName in $connectionsProps.Name)
+            $icsConnectionsObj = foreach ($method in "EnumPublicConnections","EnumPrivateConnections")
             {
-                $connection = $netShare.EnumEveryConnection | Where-Object {$netShare.NetConnectionProps.Invoke($_).Name -eq $connectionName}
-                $connectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($connection)
-
-                if ($connectionConfig.SharingEnabled)
+                try
                 {
-                    [pscustomobject]@{Name = $connectionName; Config = $connectionConfig; Type = $connectionConfig.SharingConnectionType}
+                    [pscustomobject]@{
+                          Name = $netshare.$method.Invoke(0) | ForEach-Object { $netShare.NetConnectionProps.Invoke($_).Name }
+                        Config = $netshare.$method.Invoke(0) | ForEach-Object { $netShare.INetSharingConfigurationForINetConnection.Invoke($_) }
+                    }
                 }
+                catch { continue }
             }
-            if ($connectionsICS -and $PSCmdlet.ShouldProcess(($connectionsICS | Sort-Object Type).Name -join ", ", 'Disable-Ics'))
+            if ($icsConnectionsObj -and $PSCmdlet.ShouldProcess(($icsConnectionsObj.Name -join ", "), 'Disable-Ics'))
             {
-                $connectionsICS.Config | ForEach-Object { $_.DisableSharing() }
+                $icsConnectionsObj.Config | ForEach-Object { $_.DisableSharing() }
             }
 
             if ($PSCmdlet.ShouldProcess(($PublicConnectionName, $PrivateConnectionName) -join ", "))
@@ -140,7 +146,7 @@ function Set-Ics
     }
     end
     {
-        if ($PassThru -and -not $WhatIfPreference) { Get-Ics -ConnectionNames $PublicConnectionName, $PrivateConnectionName }
+        if ($PassThru -and -not $WhatIfPreference) { Get-Ics }
     }
 }
 
@@ -209,19 +215,19 @@ function Get-Ics
 
     begin
     {
-        if (-not ([WindowsPrincipal][WindowsIdentity]::GetCurrent()).IsInRole([WindowsBuiltInRole]'Administrator'))
+        if ($PSCmdlet.MyInvocation.PSCommandPath -notmatch 'PSInternetConnectionSharing.psm1$')
         {
-            $exception = "This function requires administrator rights."
-            $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord -Args $exception, 'AdminPrivilegeRequired', 18, $null))
-        }
+            if (-not ([WindowsPrincipal][WindowsIdentity]::GetCurrent()).IsInRole([WindowsBuiltInRole]'Administrator'))
+            {
+                $exception = "This function requires administrator rights."
+                $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord -Args $exception, 'AdminPrivilegeRequired', 18, $null))
+            }
 
-        regsvr32 /s hnetcfg.dll
-        $netShare = New-Object -ComObject HNetCfg.HNetShare
+            regsvr32 /s hnetcfg.dll
+            $netShare = New-Object -ComObject HNetCfg.HNetShare
 
-        if ($PSCmdlet.MyInvocation.PSCommandPath -notmatch 'PSInternetConnectionSharing.psm1')
-        {
-            $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object {$netShare.NetConnectionProps.Invoke($_)} |
-                Where-Object Status -NE $null
+            $connections = @($netShare.EnumEveryConnection)
+            $connectionsProps = $connections | ForEach-Object { $netShare.NetConnectionProps.Invoke($_) } | Where-Object Status -NE $null
 
             if ($ConnectionNames)
             {
@@ -238,43 +244,60 @@ function Get-Ics
                     }
                 }
             }
+            elseif ($AllConnections) { $ConnectionNames = $connectionsProps.Name }
+            else {}
         }
-        if (-not $ConnectionNames) { $connectionNames = $connectionsProps.Name }
+        else
+        {
+            if (-not $connections) { $connections = @($netShare.EnumEveryConnection) }
+        }
     }
     process
     {
-        $output = foreach ($connectionName in $connectionNames)
+        if ($ConnectionNames)
         {
-            $connection = $netShare.EnumEveryConnection | Where-Object {$netShare.NetConnectionProps.Invoke($_).Name -eq $connectionName}
-            $connectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($connection)
-
-            if ($connectionConfig.SharingEnabled)
+            $output = foreach ($connectionName in $ConnectionNames)
             {
-                if ($connectionConfig.SharingConnectionType -eq 0)
+                $connection = $connections | Where-Object {$netShare.NetConnectionProps.Invoke($_).Name -eq $connectionName}
+                $connectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($connection)
+
+                if ($connectionConfig.SharingEnabled)
                 {
-                    [pscustomobject]@{ConnectionName = $connectionName; ICSEnabled = $true; ConnectionType = 'Public'}
+                    [pscustomobject]@{
+                        ConnectionName = $connectionName
+                            ICSEnabled = $true
+                        ConnectionType = if ($connectionConfig.SharingConnectionType -eq 0) { 'Public' } else { 'Private' }
+                    }
                 }
                 else
                 {
-                    [pscustomobject]@{ConnectionName = $connectionName; ICSEnabled = $true; ConnectionType = 'Private'}
+                    [pscustomobject]@{ConnectionName = $connectionName; ICSEnabled = $false}
                 }
             }
-            else
+        }
+        else
+        {
+            $output = foreach ($method in "EnumPublicConnections","EnumPrivateConnections")
             {
-                [pscustomobject]@{ConnectionName = $connectionName; ICSEnabled = $false}
+                try
+                {
+                    [pscustomobject]@{
+                          ConnectionName = $netshare.$method.Invoke(0) | ForEach-Object { $netShare.NetConnectionProps.Invoke($_).Name }
+                              ICSEnabled = $true
+                          ConnectionType = if ($method -match 'Public') { 'Public' } else { 'Private' }
+                    }
+                }
+                catch { continue }
             }
         }
     }
     end
     {
-        if ($AllConnections -or $PSBoundParameters.ContainsKey('ConnectionNames'))
+        if ($PSCmdlet.MyInvocation.PSCommandPath -notmatch 'PSInternetConnectionSharing.psm1$')
         {
-             $output | Sort-Object ICSEnabled, ConnectionType, @{Expression='ConnectionName'; Ascending=$true} -Descending
+            $output | Sort-Object ConnectionType -Descending
         }
-        else
-        {
-             $output | Where-Object ICSEnabled | Sort-Object ConnectionType -Descending
-        }
+        else { $output }
     }
 }
 
@@ -335,33 +358,27 @@ function Disable-Ics
 
         regsvr32 /s hnetcfg.dll
         $netShare = New-Object -ComObject HNetCfg.HNetShare
-
-        $connectionsProps = $netShare.EnumEveryConnection | ForEach-Object {$netShare.NetConnectionProps.Invoke($_)} |
-            Where-Object Status -NE $null
     }
     process
     {
-        $connectionsICS = foreach ($connectionName in $connectionsProps.Name)
+        $icsConnectionsObj = foreach ($method in "EnumPublicConnections","EnumPrivateConnections")
         {
-            $connection = $netShare.EnumEveryConnection | Where-Object {$netShare.NetConnectionProps.Invoke($_).Name -eq $connectionName}
-            $connectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($connection)
-
-            if ($connectionConfig.SharingEnabled)
+            try
             {
-                [pscustomobject]@{Name = $connectionName; Config = $connectionConfig; Type = $connectionConfig.SharingConnectionType}
+                [pscustomobject]@{
+                      Name = $netShare.$method.Invoke(0) | ForEach-Object { $netShare.NetConnectionProps.Invoke($_).Name }
+                    Config = $netShare.$method.Invoke(0) | ForEach-Object { $netShare.INetSharingConfigurationForINetConnection.Invoke($_) }
+                }
             }
+            catch { continue }
         }
-        if ($connectionsICS -and $PSCmdlet.ShouldProcess(($connectionsICS | Sort-Object Type).Name -join ", "))
+        if ($icsConnectionsObj -and $PSCmdlet.ShouldProcess($connections.Name -join ", "))
         {
-            $connectionsICS.Config | ForEach-Object { $_.DisableSharing() }
+            $icsConnectionsObj.Config | ForEach-Object { $_.DisableSharing() }
         }
     }
     end
     {
-        if ($PassThru -and -not $WhatIfPreference)
-        {
-            if ($connectionsICS) { Get-Ics -ConnectionNames $connectionsICS.Name }
-            else                 { Get-Ics -AllConnections }
-        }
+        if ($PassThru -and -not $WhatIfPreference) { Get-Ics -ConnectionNames $icsConnectionsObj.Name }
     }
 }
