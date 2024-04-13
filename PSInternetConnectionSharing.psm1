@@ -271,7 +271,11 @@ function Get-Ics
             {
                 $connection = $connections | Where-Object {$netShare.NetConnectionProps.Invoke($_).Name -eq $connectionName}
                 try   { $connectionConfig = $netShare.INetSharingConfigurationForINetConnection.Invoke($connection) }
-                catch { if (-not $AllConnections) { Write-Warning "ICS is not settable for connection '${connectionName}'." } }
+                catch
+                { 
+                    $connectionConfig = $null
+                    if (-not $AllConnections) { Write-Warning "ICS is not settable for connection '${connectionName}'." }
+                }
 
                 if ($connectionConfig.SharingEnabled -eq 1)
                 {
