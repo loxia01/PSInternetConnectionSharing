@@ -145,7 +145,7 @@ function Set-Ics
             }
             if ($icsConnections -and $PSCmdlet.ShouldProcess(($icsConnections.Name -join ", "), 'Disable-Ics'))
             {
-                $icsConnections.Config | ForEach-Object {$_.DisableSharing()}
+                $icsConnections.Config | ForEach-Object DisableSharing
             }
 
             if ($PSCmdlet.ShouldProcess(($PublicConnectionName, $PrivateConnectionName) -join ", "))
@@ -393,7 +393,7 @@ function Disable-Ics
         }
         if ($icsConnections -and $PSCmdlet.ShouldProcess($icsConnections.Name -join ", "))
         {
-            $icsConnections.Config | ForEach-Object {$_.DisableSharing()}
+            $icsConnections.Config | ForEach-Object DisableSharing
         }
     }
     end
