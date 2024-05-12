@@ -90,7 +90,7 @@ function Set-Ics
                 $exception = New-Object PSArgumentException "Cannot find a network connection with name '$($_.Value)'."
                 $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord -Args $exception, 'ConnectionNotFound', 13, $null))
             }
-            else { $_.Value = $connectionsProps | Where-Object Name -EQ $_.Value | Select-Object -ExpandProperty Name }
+            else { $_.Value = $connectionsProps | Where-Object Name -EQ $_.Value | ForEach-Object Name }
         }
 
         if ($PrivateConnectionName -eq $PublicConnectionName)
