@@ -90,7 +90,7 @@ function Set-Ics
                 $exception = New-Object PSArgumentException "Cannot find a network connection with name '$($_.Value)'."
                 $PSCmdlet.ThrowTerminatingError((New-Object ErrorRecord -Args $exception, 'ConnectionNotFound', 13, $null))
             }
-            else { $_.Value = $connectionsProps | Where-Object Name -EQ $_.Value | ForEach-Object Name }
+            else { $_.Value = $connectionsProps | Where-Object Name -EQ $_.Value | Select-Object -ExpandProperty Name }
         }
 
         if ($PrivateConnectionName -eq $PublicConnectionName)
@@ -145,7 +145,7 @@ function Set-Ics
             }
             if ($icsConnections -and $PSCmdlet.ShouldProcess(($icsConnections.Name -join ", "), 'Disable-Ics'))
             {
-                $icsConnections.Config | ForEach-Object DisableSharing
+                $icsConnections.Config | ForEach-Object {$_.DisableSharing()}
             }
 
             if ($PSCmdlet.ShouldProcess(($PublicConnectionName, $PrivateConnectionName) -join ", "))
@@ -393,7 +393,7 @@ function Disable-Ics
         }
         if ($icsConnections -and $PSCmdlet.ShouldProcess($icsConnections.Name -join ", "))
         {
-            $icsConnections.Config | ForEach-Object DisableSharing
+            $icsConnections.Config | ForEach-Object {$_.DisableSharing()}
         }
     }
     end
